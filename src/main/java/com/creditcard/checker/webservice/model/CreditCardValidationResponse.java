@@ -1,6 +1,6 @@
 package com.creditcard.checker.webservice.model;
 
-public class ValidationResult {
+public class CreditCardValidationResponse {
 
     String cardNumber;
     CardType cardType;
