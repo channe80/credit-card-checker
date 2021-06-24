@@ -4,9 +4,7 @@ import com.creditcard.checker.webservice.model.CardType;
 import com.creditcard.checker.webservice.model.ValidationResult;
 import com.creditcard.checker.webservice.service.CreditCardValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class CreditCardCheckerController {
@@ -14,13 +12,13 @@ public class CreditCardCheckerController {
     @Autowired
     private CreditCardValidationService creditCardValidationService;
 
-    @GetMapping(path="/creditcards/{number}")
-    public ValidationResult validateCreditCard(@PathVariable String number) {
+    @PostMapping(path="/creditcards")
+    public ValidationResult validateCreditCard(@RequestBody String cardNumber) {
 
         ValidationResult result = new ValidationResult();
-        result.setCardNumber(number);
+        result.setCardNumber(cardNumber);
 
-        CardType cardType = creditCardValidationService.getCardType(number);
+        CardType cardType = creditCardValidationService.getCardType(cardNumber);
         result.setCardType(cardType);
 
         if (CardType.Unknown.equals(cardType)) {
