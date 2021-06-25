@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class CreditCardValidationServiceImpl implements CreditCardValidationServ
     @PostConstruct
     public void onBoot() {
         try {
-            File regexPatterns = new ClassPathResource("static/creditCardRegex.json").getFile();
+            InputStream regexPatterns = new ClassPathResource("static/creditCardRegex.json").getInputStream();
             ObjectMapper mapper = new ObjectMapper();
             List<CardTypePattern> cardTypePatterns = mapper.readValue(regexPatterns, new TypeReference<>() {});
             for (CardTypePattern cardTypePattern : cardTypePatterns) {
