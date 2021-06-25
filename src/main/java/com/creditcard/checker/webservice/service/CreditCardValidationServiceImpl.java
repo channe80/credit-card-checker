@@ -2,7 +2,6 @@ package com.creditcard.checker.webservice.service;
 
 import com.creditcard.checker.webservice.model.CardType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,24 +18,27 @@ public class CreditCardValidationServiceImpl implements CreditCardValidationServ
     //Visa begins with 4, number length of 13 or 16
     private static Pattern VISA_PATTERN = Pattern.compile("^4[0-9]{12}(?:[0-9]{3})?$");
 
+    /**
+     * Determine credit card type based on the card number
+     * @param cardNumber Series of digits without space
+     * @return CardType
+     */
     @Override
-    public CardType getCardType(String cardNumber) {
+    public CardType determineCardType(String cardNumber) {
         if (null == cardNumber || cardNumber.isEmpty() || cardNumber.isBlank()) {
             return CardType.Unknown;
         }
 
-        String cardNumberTrimmed = StringUtils.trimAllWhitespace(cardNumber);
-
-        if (isAmexCardFormat(cardNumberTrimmed)) {
+        if (isAmexCardFormat(cardNumber)) {
             return CardType.AMEX;
         }
-        if (isDiscoverCardFormat(cardNumberTrimmed)) {
+        if (isDiscoverCardFormat(cardNumber)) {
             return CardType.Discover;
         }
-        if (isMasterCardFormat(cardNumberTrimmed)) {
+        if (isMasterCardFormat(cardNumber)) {
             return CardType.MasterCard;
         }
-        if (isVisaCardFormat(cardNumberTrimmed)) {
+        if (isVisaCardFormat(cardNumber)) {
             return CardType.Visa;
         }
 
@@ -63,10 +65,42 @@ public class CreditCardValidationServiceImpl implements CreditCardValidationServ
         return m.matches();
     }
 
+    /**
+     * Validate card number using Luhn Algorithm
+     * @param cardNumber Series of digits without space
+     * @return boolean
+     */
     @Override
-    public boolean isValidByLuhnAlgo() {
+    public boolean validateByLuhnAlgorithm(String cardNumber) {
+        int sum = 0;
+        boolean doubleDigit = false;
+        for (int i = cardNumber.length()-1; i >= 0; i--) {
+            int digit = Character.getNumericValue(cardNumber.charAt(i));
+            if (doubleDigit) {
+                sum = doubleAndToSum(sum, digit);
+                doubleDigit = false;
+            } else {
+                //add to sum
+                sum += digit;
+                doubleDigit = true;
+            }
+        }
+        int mod = sum % 10;
 
-        return false;
+        return mod == 0;
     }
 
+    private int doubleAndToSum(int currentSum, int digit) {
+        digit = digit * 2;
+        if (digit < 10) {
+            currentSum += digit;
+        } else {
+            //if double digit - separate and add
+            String digitStr = String.valueOf(digit);
+            for (int j = 0; j < digitStr.length(); j++ ) {
+                currentSum += Character.getNumericValue(digitStr.charAt(j));
+            }
+        }
+        return currentSum;
+    }
 }

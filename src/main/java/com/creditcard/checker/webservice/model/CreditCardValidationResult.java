@@ -1,10 +1,15 @@
 package com.creditcard.checker.webservice.model;
 
-public class CreditCardValidationResponse {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+public class CreditCardValidationResult {
 
     String cardNumber;
     CardType cardType;
     Boolean valid;
+
+    @JsonIgnore
+    String cardNumberTrimmed;
 
     public String getCardNumber() {
         return cardNumber;
@@ -28,5 +33,13 @@ public class CreditCardValidationResponse {
 
     public void setValid(Boolean valid) {
         this.valid = valid;
+    }
+
+    public String getCardNumberTrimmed() {
+        return cardNumberTrimmed;
+    }
+
+    public void setCardNumberTrimmed(String cardNumberTrimmed) {
+        this.cardNumberTrimmed = cardNumberTrimmed;
     }
 }

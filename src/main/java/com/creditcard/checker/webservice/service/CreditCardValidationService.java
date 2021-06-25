@@ -4,8 +4,8 @@ import com.creditcard.checker.webservice.model.CardType;
 
 public interface CreditCardValidationService {
 
-    CardType getCardType(String cardNumber);
+    CardType determineCardType(String cardNumber);
 
-    boolean isValidByLuhnAlgo();
+    boolean validateByLuhnAlgorithm(String cardNumber);
 }
 
