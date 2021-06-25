@@ -2,11 +2,23 @@ package com.creditcard.checker.webservice.service;
 
 import com.creditcard.checker.webservice.model.CardType;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 class CreditCardValidationServiceImplTest {
 
     CreditCardValidationService cardValidationService = new CreditCardValidationServiceImpl();
+
+    @BeforeEach
+    void setup() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        //call post-constructor
+        Method postConstruct =  CreditCardValidationServiceImpl.class.getDeclaredMethod("onBoot");
+        postConstruct.setAccessible(true);
+        postConstruct.invoke(cardValidationService);
+    }
 
     @Test
     void getCardType_emptyNullUnknowValues() {

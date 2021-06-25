@@ -1,22 +1,39 @@
 package com.creditcard.checker.webservice.service;
 
 import com.creditcard.checker.webservice.model.CardType;
+import com.creditcard.checker.webservice.model.CardTypePattern;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 public class CreditCardValidationServiceImpl implements CreditCardValidationService {
 
-    //AMEX Card begins with 34 or 37, number length of 15
-    private static Pattern AMEX_PATTERN = Pattern.compile("^3[47][0-9]{13}$");
-    //Discover Card begins with 6011, number length of 16
-    private static Pattern DISCOVER_PATTERN = Pattern.compile("^6011[0-9]{12}$");
-    //Mastercard begins with 51 to 55, number length of 16
-    private static Pattern MASTERCARD_PATTERN = Pattern.compile("^5[1-5][0-9]{14}$");
-    //Visa begins with 4, number length of 13 or 16
-    private static Pattern VISA_PATTERN = Pattern.compile("^4[0-9]{12}(?:[0-9]{3})?$");
+    private static Map<CardType, Pattern> CARD_TYPE_PATTERNS = new HashMap<>();
+
+    @PostConstruct
+    public void onBoot() {
+        try {
+            File regexPatterns = new ClassPathResource("static/creditCardRegex.json").getFile();
+            ObjectMapper mapper = new ObjectMapper();
+            List<CardTypePattern> cardTypePatterns = mapper.readValue(regexPatterns, new TypeReference<>() {});
+            for (CardTypePattern cardTypePattern : cardTypePatterns) {
+                CARD_TYPE_PATTERNS.put(cardTypePattern.getCardType(), Pattern.compile(cardTypePattern.getRegex()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Determine credit card type based on the card number
@@ -28,41 +45,14 @@ public class CreditCardValidationServiceImpl implements CreditCardValidationServ
         if (null == cardNumber || cardNumber.isEmpty() || cardNumber.isBlank()) {
             return CardType.Unknown;
         }
-
-        if (isAmexCardFormat(cardNumber)) {
-            return CardType.AMEX;
-        }
-        if (isDiscoverCardFormat(cardNumber)) {
-            return CardType.Discover;
-        }
-        if (isMasterCardFormat(cardNumber)) {
-            return CardType.MasterCard;
-        }
-        if (isVisaCardFormat(cardNumber)) {
-            return CardType.Visa;
+        for (CardType cardType : CARD_TYPE_PATTERNS.keySet()) {
+            Matcher m = CARD_TYPE_PATTERNS.get(cardType).matcher(cardNumber);
+            if (m.matches()) {
+                return cardType;
+            }
         }
 
         return CardType.Unknown;
-    }
-
-    private boolean isAmexCardFormat(String cardNumber) {
-        Matcher m = AMEX_PATTERN.matcher(cardNumber);
-        return m.matches();
-    }
-
-    private boolean isDiscoverCardFormat(String cardNumber) {
-        Matcher m = DISCOVER_PATTERN.matcher(cardNumber);
-        return m.matches();
-    }
-
-    private boolean isMasterCardFormat(String cardNumber) {
-        Matcher m = MASTERCARD_PATTERN.matcher(cardNumber);
-        return m.matches();
-    }
-
-    private boolean isVisaCardFormat(String cardNumber) {
-        Matcher m = VISA_PATTERN.matcher(cardNumber);
-        return m.matches();
     }
 
     /**

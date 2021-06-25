@@ -1,0 +1,22 @@
+[
+  {
+    "cardType": "AMEX",
+    "regex" : "^3[47][0-9]{13}$",
+    "description" : "AMEX Card begins with 34 or 37, number length of 15"
+  },
+  {
+    "cardType": "Discover",
+    "regex" : "^6011[0-9]{12}$",
+    "description" : "Discover Card begins with 6011, number length of 16"
+  },
+  {
+    "cardType": "MasterCard",
+    "regex" : "^5[1-5][0-9]{14}$",
+    "description" : "Mastercard begins with 51 to 55, number length of 16"
+  },
+  {
+    "cardType": "Visa",
+    "regex" : "^4[0-9]{12}(?:[0-9]{3})?$",
+    "description" : "Visa begins with 4, number length of 13 or 16"
+  }
+]
