@@ -3,11 +3,11 @@
 This is a simple REST API application that validates different kinds of credit card numbers.  
 Credit card types checked are AMEX, Discover, MasterCard and Visa. 
 
-##Technology used
+## Technology used
 
 This project is built using Java Spring Boot 4.
 
-##How to run
+## How to run
 
 To build project, go to project directory and run command:
 ```
